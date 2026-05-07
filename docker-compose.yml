@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Первый backend-сервер
+  backend-1:
+    build: ./backend
+    container_name: backend-1
+    environment:
+      - PORT=3001
+      - SERVER_ID=backend-1
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Второй backend-сервер
+  backend-2:
+    build: ./backend
+    container_name: backend-2
+    environment:
+      - PORT=3002
+      - SERVER_ID=backend-2
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Nginx балансировщик
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-balancer
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend-1
+      - backend-2
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

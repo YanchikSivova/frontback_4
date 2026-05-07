@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  backend-1:
+    build: ./backend
+    environment:
+      - PORT=3001
+      - SERVER_ID=backend-1
+    networks:
+      - app-network
+
+  backend-2:
+    build: ./backend
+    environment:
+      - PORT=3002
+      - SERVER_ID=backend-2
+    networks:
+      - app-network
+
+  haproxy:
+    image: haproxy:latest
+    container_name: haproxy-balancer
+    ports:
+      - "80:80"
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - backend-1
+      - backend-2
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
