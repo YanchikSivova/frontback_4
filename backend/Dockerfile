@@ -3,8 +3,11 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --production
 
-COPY index.js .
+RUN npm ci --only=production
 
-CMD ["node", "index.js"]
+COPY . .
+
+EXPOSE 3001 3002
+
+CMD ["node", "app.js"]
